@@ -106,7 +106,7 @@ mkdir branched &&
 (cd branched &&
     create_client branched_dev branched_dev &&
     export P4CLIENT=branched_dev &&
-    p4cmd integrate //depot/dev/... ... &&
+    p4cmd integrate -3 //depot/dev/... ... &&
     p4cmd resolve -am ... &&
     p4cmd submit -d 'integrate from dev'
 ) &&
@@ -129,7 +129,7 @@ banner now integrate this &&
 
 (cd branched &&
     export P4CLIENT=branched_dev &&
-    p4cmd integrate //depot/dev/... ... &&
+    p4cmd integrate -3 //depot/dev/... ... &&
     p4cmd resolve -am ... &&
     p4cmd submit -d 'second integrate from dev' &&
     expect_file mdev_initial.conf &&
