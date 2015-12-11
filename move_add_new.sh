@@ -83,11 +83,18 @@ start_p4d() {
     )
 }
 
-rm -fr cli db branched
+stop_p4d() {
+    p4 admin stop &&
+    wait $p4pid
+}
+
+rm -fr trashdir &&
+mkdir trashdir &&
+cd trashdir &&
 start_p4d &&
 p4pid=$(cat p4.pid) &&
 echo "started p4d at pid $p4pid" &&
-trap "kill $p4pid" 0 &&
+trap stop_p4d 0 &&
 
 banner create initial state &&
 
@@ -97,7 +104,8 @@ mkdir cli &&
     echo "mdev configuration" >mdev.conf &&
     export P4CLIENT=dev &&
     p4cmd add mdev.conf &&
-    p4cmd submit -d 'initial'
+    p4cmd submit -d 'initial' &&
+    expect_file mdev.conf
 ) &&
 
 banner integrate to a branch &&
@@ -108,7 +116,8 @@ mkdir branched &&
     export P4CLIENT=branched_dev &&
     p4cmd integrate -3 //depot/dev/... ... &&
     p4cmd resolve -am ... &&
-    p4cmd submit -d 'integrate from dev'
+    p4cmd submit -d 'integrate from dev' &&
+    expect_file mdev.conf
 ) &&
 
 banner move mdev.conf &&
@@ -132,6 +141,8 @@ banner now integrate this &&
     p4cmd integrate -3 //depot/dev/... ... &&
     p4cmd resolve -am ... &&
     p4cmd submit -d 'second integrate from dev' &&
+    (p4 filelog //depot/dev/mdev.conf | tee mdev.conf.filelog) &&
+    (p4 filelog //depot/branched_dev/mdev.conf | tee mdev.conf.branched.filelog) &&
     expect_file mdev_initial.conf &&
     expect_file mdev.conf
 )
