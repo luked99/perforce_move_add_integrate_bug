@@ -50,7 +50,7 @@ create_client() {
         depot=$2 &&
         root=$(pwd) &&
         printf "Client: $name\nRoot: $root\nView://depot/$depot/... //$name/...\n" | p4 client -i
-        p4cmd clients
+        p4 clients
 }
 
 error() {
@@ -72,7 +72,7 @@ banner() {
 }
 
 p4cmd() {
-    echo "\033[1;35;40mp4 -c $P4CLIENT $*\033[0m"
+    printf "\033[1;34;40mp4 -c $P4CLIENT $*\033[0m"
     p4 -c $P4CLIENT "$@"
 }
 
